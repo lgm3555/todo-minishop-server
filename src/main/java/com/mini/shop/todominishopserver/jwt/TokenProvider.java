@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+@Component
 public class TokenProvider implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
@@ -37,18 +39,24 @@ public class TokenProvider implements InitializingBean {
         this.tokenValidatyInMilliseconds = tokenValidatyInMilliseconds * 1000;
     }
 
+    /**
+     * InitializingBean을 implements한 이유
+     * 빈 생성(@Component) 후 의존성 주입을 받은 후 afterPropertieseSet이 실행되어 key를 할당하기 위해.
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         byte[] keyBytes = Decoders.BASE64.decode(secret);;
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    //Authentication 객체의 권한 정보를 이용해서 토큰을 생성하는 메소드
     public String createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
+        //만료시간 설정
         Date validity = new Date(now + this.tokenValidatyInMilliseconds);
 
         return Jwts.builder()
@@ -59,6 +67,7 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+    //Token에 담아져있는 정보를 이용해 Authentication 객체를 리턴
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts
                 .parserBuilder()
@@ -77,6 +86,7 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
+    //Token을 파싱해보고 검증 후 예외 처리
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
