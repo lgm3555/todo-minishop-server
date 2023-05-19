@@ -1,10 +1,10 @@
-package com.mini.shop.todominishopserver.auth.service;
+package com.mini.shop.auth.service;
 
-import com.mini.shop.todominishopserver.auth.dto.UserDto;
-import com.mini.shop.todominishopserver.auth.entity.Authority;
-import com.mini.shop.todominishopserver.auth.entity.User;
-import com.mini.shop.todominishopserver.auth.repository.UserRepository;
-import com.mini.shop.todominishopserver.util.SecurityUtil;
+import com.mini.shop.auth.dto.UserDto;
+import com.mini.shop.auth.repository.UserRepository;
+import com.mini.shop.auth.entity.Authority;
+import com.mini.shop.auth.entity.User;
+import com.mini.shop.util.SecurityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class UserService {
     @Transactional
     public User signup(UserDto userDto) {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
-            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+            throw new RuntimeException("아이디가 이미 존재합니다.");
         }
 
         Authority authority = Authority.builder()

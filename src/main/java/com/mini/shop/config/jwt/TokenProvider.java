@@ -1,5 +1,6 @@
-package com.mini.shop.todominishopserver.jwt;
+package com.mini.shop.config.jwt;
 
+import com.mini.shop.auth.dto.TokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+// Token의 생성, 인증정보 조회, 유효성 검증, 암호화 설정등의 역할을 하는 클래스
 @Component
 public class TokenProvider implements InitializingBean {
 
@@ -28,15 +30,19 @@ public class TokenProvider implements InitializingBean {
     private static final String AUTHORITIES_KEY = "auth";
 
     private final String secret;
-    private final long tokenValidatyInMilliseconds;
+    private final long accessTokenValidatyInMilliseconds;
+    private final long refreshTokenValidatyInMilliseconds;
 
     private Key key;
 
     public TokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") long tokenValidatyInMilliseconds) {
+            @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidatyInMilliseconds,
+            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidatyInMilliseconds
+    ) {
         this.secret = secret;
-        this.tokenValidatyInMilliseconds = tokenValidatyInMilliseconds * 1000;
+        this.accessTokenValidatyInMilliseconds = accessTokenValidatyInMilliseconds * 1000;
+        this.refreshTokenValidatyInMilliseconds = refreshTokenValidatyInMilliseconds * 1000;
     }
 
     /**
@@ -50,21 +56,37 @@ public class TokenProvider implements InitializingBean {
     }
 
     //Authentication 객체의 권한 정보를 이용해서 토큰을 생성하는 메소드
-    public String createToken(Authentication authentication) {
+    public TokenDto createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        long now = (new Date()).getTime();
-        //만료시간 설정
-        Date validity = new Date(now + this.tokenValidatyInMilliseconds);
+        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        claims.put(AUTHORITIES_KEY, authorities);
 
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
+        //만료시간 설정
+        Date now = new Date();
+        Date accessValidity = new Date(now.getTime() + this.accessTokenValidatyInMilliseconds);
+        Date refreshValidity = new Date(now.getTime() + this.refreshTokenValidatyInMilliseconds);
+
+        String accessToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
                 .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validity)
+                .setExpiration(accessValidity)
                 .compact();
+
+        String refreshToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(refreshValidity)
+                .compact();
+
+        return TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     //Token에 담아져있는 정보를 이용해 Authentication 객체를 리턴

@@ -1,6 +1,6 @@
-package com.mini.shop.todominishopserver.auth.repository;
+package com.mini.shop.auth.repository;
 
-import com.mini.shop.todominishopserver.auth.entity.User;
+import com.mini.shop.auth.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

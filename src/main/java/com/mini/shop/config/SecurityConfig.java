@@ -1,9 +1,9 @@
-package com.mini.shop.todominishopserver.config;
+package com.mini.shop.config;
 
-import com.mini.shop.todominishopserver.jwt.JwtAccessDeniedHandler;
-import com.mini.shop.todominishopserver.jwt.JwtAuthenticationEntryPoint;
-import com.mini.shop.todominishopserver.jwt.JwtSecurityConfig;
-import com.mini.shop.todominishopserver.jwt.TokenProvider;
+import com.mini.shop.config.jwt.JwtAuthenticationForbbiden;
+import com.mini.shop.config.jwt.JwtAuthenticationUnauthorized;
+import com.mini.shop.config.jwt.JwtSecurityConfig;
+import com.mini.shop.config.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,13 +21,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적인 보안 설정을 위해 extends
 
     private final TokenProvider tokenProvider;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationUnauthorized jwtAuthenticationUnauthorized;
+    private final JwtAuthenticationForbbiden jwtAuthenticationForbbiden;
 
-    public SecurityConfig(TokenProvider tokenProvider, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+    public SecurityConfig(TokenProvider tokenProvider, JwtAuthenticationUnauthorized jwtAuthenticationUnauthorized, JwtAuthenticationForbbiden jwtAuthenticationForbbiden) {
         this.tokenProvider = tokenProvider;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.jwtAuthenticationUnauthorized = jwtAuthenticationUnauthorized;
+        this.jwtAuthenticationForbbiden = jwtAuthenticationForbbiden;
     }
 
     @Bean
@@ -90,8 +90,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
         http.csrf().disable()
 
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .authenticationEntryPoint(jwtAuthenticationUnauthorized)
+                .accessDeniedHandler(jwtAuthenticationForbbiden)
 
                 .and()
                 .headers()
@@ -104,9 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/hello").permitAll()
-                .antMatchers("/api/authenticate").permitAll()
-                .antMatchers("/api/signup").permitAll()
+                .antMatchers("/auth/login").permitAll()
+                .antMatchers("/auth/signup").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

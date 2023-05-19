@@ -1,4 +1,4 @@
-package com.mini.shop.todominishopserver.auth.dto;
+package com.mini.shop.auth.dto;
 
 import lombok.*;
 
@@ -8,5 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TokenDto {
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 }

@@ -1,4 +1,4 @@
-package com.mini.shop.todominishopserver;
+package com.mini.shop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

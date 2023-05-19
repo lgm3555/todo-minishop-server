@@ -1,4 +1,4 @@
-package com.mini.shop.todominishopserver;
+package com.mini.shop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

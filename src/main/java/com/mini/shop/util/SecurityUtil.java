@@ -1,4 +1,4 @@
-package com.mini.shop.todominishopserver.util;
+package com.mini.shop.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class SecurityUtil {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
-            logger.debug("Security Context에 인증 정보가 없습니다.");
+            logger.info("Security Context에 인증 정보가 없습니다.");
             return Optional.empty();
         }
 

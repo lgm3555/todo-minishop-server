@@ -1,7 +1,7 @@
-package com.mini.shop.todominishopserver.auth.service;
+package com.mini.shop.auth.service;
 
-import com.mini.shop.todominishopserver.auth.entity.User;
-import com.mini.shop.todominishopserver.auth.repository.UserRepository;
+import com.mini.shop.auth.entity.User;
+import com.mini.shop.auth.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,4 +1,4 @@
-package com.mini.shop.todominishopserver.auth.entity;
+package com.mini.shop.auth.entity;
 
 import lombok.*;
 
