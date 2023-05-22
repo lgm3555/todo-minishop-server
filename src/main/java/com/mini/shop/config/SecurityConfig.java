@@ -105,6 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
                 .and()
                 .authorizeRequests()
                 .antMatchers("/auth/login").permitAll()
+                .antMatchers("/auth/refresh").permitAll()
                 .antMatchers("/auth/signup").permitAll()
                 .anyRequest().authenticated()
 

@@ -56,7 +56,7 @@ public class TokenProvider implements InitializingBean {
     }
 
     //Authentication 객체의 권한 정보를 이용해서 토큰을 생성하는 메소드
-    public TokenDto createToken(Authentication authentication) {
+     public String createAccessToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -67,7 +67,6 @@ public class TokenProvider implements InitializingBean {
         //만료시간 설정
         Date now = new Date();
         Date accessValidity = new Date(now.getTime() + this.accessTokenValidatyInMilliseconds);
-        Date refreshValidity = new Date(now.getTime() + this.refreshTokenValidatyInMilliseconds);
 
         String accessToken = Jwts.builder()
                 .setClaims(claims)
@@ -76,6 +75,21 @@ public class TokenProvider implements InitializingBean {
                 .setExpiration(accessValidity)
                 .compact();
 
+        return accessToken;
+    }
+
+    public String createRefreshToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        Claims claims = Jwts.claims().setSubject(authentication.getName());
+        claims.put(AUTHORITIES_KEY, authorities);
+
+        //만료시간 설정
+        Date now = new Date();
+        Date refreshValidity = new Date(now.getTime() + this.refreshTokenValidatyInMilliseconds);
+
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
@@ -83,10 +97,7 @@ public class TokenProvider implements InitializingBean {
                 .setExpiration(refreshValidity)
                 .compact();
 
-        return TokenDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return refreshToken;
     }
 
     //Token에 담아져있는 정보를 이용해 Authentication 객체를 리턴

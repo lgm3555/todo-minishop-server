@@ -1,10 +1,13 @@
 package com.mini.shop.auth.service;
 
+import com.mini.shop.auth.controller.AuthTokenController;
 import com.mini.shop.auth.dto.UserDto;
-import com.mini.shop.auth.repository.UserRepository;
 import com.mini.shop.auth.entity.Authority;
 import com.mini.shop.auth.entity.User;
+import com.mini.shop.auth.repository.UserRepository;
 import com.mini.shop.util.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +17,8 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
