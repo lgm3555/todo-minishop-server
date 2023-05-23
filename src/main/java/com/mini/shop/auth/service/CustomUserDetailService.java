@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DB에서 USER 정보를 가져와 리턴해줌.
+ */
 @Component("userDetailService")
 public class CustomUserDetailService implements UserDetailsService {
 

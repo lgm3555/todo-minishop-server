@@ -1,9 +1,8 @@
 package com.mini.shop.config;
 
-import com.mini.shop.config.jwt.JwtAuthenticationForbbiden;
-import com.mini.shop.config.jwt.JwtAuthenticationUnauthorized;
-import com.mini.shop.config.jwt.JwtSecurityConfig;
-import com.mini.shop.config.jwt.TokenProvider;
+import com.mini.shop.config.jwt.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 // @PreAuthorize 머노테이션을 메소드 단위로 사용하기 위해 작성.
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적인 보안 설정을 위해 extends
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationUnauthorized jwtAuthenticationUnauthorized;
@@ -65,6 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        logger.info("SecurityCofig configure");
+
         /**
          * HttpServletRequest를 사용하는 요청들에 대한 접근제한 설정
          * /api/hello에 대한 요청은 인증 없이 접근 허용

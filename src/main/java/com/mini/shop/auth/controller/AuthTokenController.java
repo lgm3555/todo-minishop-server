@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -40,7 +41,7 @@ public class AuthTokenController {
             throw new RuntimeException("JWT Token이 존재하지 않습니다.");
         }
         String refreshToken = authorizationHeader.substring(TOKEN_HEADER_PREFIX.length());
-        TokenDto tokenDto = authTokenService.refresh(refreshToken);
-        return new ResponseEntity<>(tokenDto, HttpStatus.OK);
+        Optional<TokenDto> tokenDto = authTokenService.refresh(refreshToken);
+        return ResponseEntity.ok(tokenDto.get());
     }
 }

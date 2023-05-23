@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthTokenService {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenController.class);
@@ -36,14 +38,14 @@ public class AuthTokenService {
         return tokenDto;
     }
 
-    public TokenDto refresh(String refreshToken) {
+    public Optional<TokenDto> refresh(String refreshToken) {
         TokenDto tokenDto = new TokenDto();
 
         if (tokenProvider.validateToken(refreshToken)) {
             Authentication authentication = tokenProvider.getAuthentication(refreshToken);
             tokenDto.setAccessToken(tokenProvider.createAccessToken(authentication));
         }
-        
-        return tokenDto;
+
+        return Optional.of(tokenDto);
     }
 }
