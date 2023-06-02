@@ -3,16 +3,18 @@ package com.mini.shop.auth.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "`user`")
+@Table(name = "Member")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Member {
 
     @Id
     @Column(name = "user_id")
@@ -28,13 +30,13 @@ public class User {
     @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @Column(name = "activated")
-    private boolean activated;
-
     @ManyToMany
-    @JoinTable(
-            name = "user_authority",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
-    private Set<Authority> authorities;
+    private List<Role> roles = new ArrayList<>();
+
+    @Column(name = "refreshToken")
+    private String refreshToken;
+
+    public void updateRefreshToken(String newToken) {
+        this.refreshToken = newToken;
+    }
 }

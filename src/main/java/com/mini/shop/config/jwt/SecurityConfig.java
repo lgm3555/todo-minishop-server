@@ -1,39 +1,42 @@
-package com.mini.shop.config;
+package com.mini.shop.config.jwt;
 
-import com.mini.shop.config.jwt.*;
+import com.mini.shop.config.jwt.filter.JwtAuthenticationFilter;
+import com.mini.shop.config.jwt.filter.JwtFilter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
+@Configuration
 // 기본적인 웹 보안을 활성화함.
 @EnableWebSecurity
-// @PreAuthorize 머노테이션을 메소드 단위로 사용하기 위해 작성.
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적인 보안 설정을 위해 extends
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    private final TokenProvider tokenProvider;
-    private final JwtAuthenticationUnauthorized jwtAuthenticationUnauthorized;
-    private final JwtAuthenticationForbbiden jwtAuthenticationForbbiden;
+    private final AuthenticationProvider authenticationProvider;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final JwtFilter jwtFilter;
+    private final AccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(TokenProvider tokenProvider, JwtAuthenticationUnauthorized jwtAuthenticationUnauthorized, JwtAuthenticationForbbiden jwtAuthenticationForbbiden) {
-        this.tokenProvider = tokenProvider;
-        this.jwtAuthenticationUnauthorized = jwtAuthenticationUnauthorized;
-        this.jwtAuthenticationForbbiden = jwtAuthenticationForbbiden;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authenticationProvider);
     }
 
     /**
@@ -67,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        logger.info("SecurityCofig configure");
+        System.out.println("securityConfig");
 
         /**
          * HttpServletRequest를 사용하는 요청들에 대한 접근제한 설정
@@ -87,33 +90,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
          *
          * 세션을 사용하지 않기 때문에 설정을 STATELESS로 설정
          *
-         * 로그인 API, 회원가입 API는 토큰이 없는 상태에기 떄문에 permitAll로 지정
+         * 로그인 API, 회원가입 rAPI는 토큰이 없는 상태에기 떄문에 pemitAll로 지정
          *
          * JwtFilter를 addFilterBefore로 등록했던 JwtSecurityConfig 클래스도 적용
          */
-        http.csrf().disable()
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManagerBean());
+        jwtAuthenticationFilter.setFilterProcessesUrl("/auth/signIn");
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        jwtAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationUnauthorized)
-                .accessDeniedHandler(jwtAuthenticationForbbiden)
+        http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
+        http.authorizeRequests().antMatchers("/auth/signUp", "/auth/refresh").permitAll();
+        http.authorizeRequests().antMatchers("/auth/user/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers("/auth/admin/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().anyRequest().authenticated();
+        http.addFilter(jwtAuthenticationFilter);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-                .and()
-                .headers()
-                .frameOptions()
-                .sameOrigin()
+        http.exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+    }
 
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
-                .authorizeRequests()
-                .antMatchers("/auth/login").permitAll()
-                .antMatchers("/auth/refresh").permitAll()
-                .antMatchers("/auth/signup").permitAll()
-                .anyRequest().authenticated()
-
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }

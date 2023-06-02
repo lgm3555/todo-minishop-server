@@ -1,9 +1,9 @@
 package com.mini.shop.auth.service;
 
-import com.mini.shop.auth.entity.User;
+import com.mini.shop.auth.entity.Member;
 import com.mini.shop.auth.repository.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,19 +28,12 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findOneWithAuthoritiesByUsername(username)
-                .map(user -> createUser(username, user))
-                .orElseThrow(() -> new UsernameNotFoundException(username + " -> 데이터베이스에서 찾을 수 없습니다."));
-    }
+        Member member = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("UserDetailsService - loadUserByUsername : 데이터베이스에서 찾을 수 없습니다."));
 
-    private org.springframework.security.core.userdetails.User createUser(String username, User user) {
-        if (!user.isActivated()) {
-            throw new RuntimeException(username + " -> 활성화되어 있지 않습니다.");
-        }
-        List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
-                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = member.getRoles()
+                .stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
+        return new User(member.getUsername(), member.getPassword(), authorities);
     }
 }

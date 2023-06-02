@@ -8,16 +8,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "authority")
+@Table(name = "Role")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Authority {
+public class Role {
 
     @Id
-    @Column(name = "authority_name", length = 50)
-    private String authorityName;
+    @Column(name = "roleName", length = 50)
+    private String roleName;
 
 }

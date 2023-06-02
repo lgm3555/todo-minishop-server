@@ -1,6 +1,7 @@
 package com.mini.shop.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mini.shop.auth.entity.Member;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -26,4 +27,12 @@ public class UserDto {
     @Size(min = 3, max = 50)
     private String nickname;
 
+    public static UserDto convertToDto(Member member) {
+        UserDto userDto = new UserDto();
+        userDto.setUsername(member.getUsername());
+        userDto.setPassword(member.getPassword());
+        userDto.setNickname(member.getNickname());
+
+        return userDto;
+    }
 }
