@@ -40,10 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String servletPath = request.getServletPath();
         String authrizationHeader = request.getHeader(AUTHORIZATION);
 
-        System.out.println("JwtFilter");
-
         // 로그인, 리프레시 요청이라면 토큰 검사하지 않음
-        if (servletPath.equals("/auth/signUp") || servletPath.equals("/auth/refresh")) {
+        if (servletPath.equals("/auth/signUp") || servletPath.equals("/auth/signIn") || servletPath.equals("/auth/refresh")) {
             filterChain.doFilter(request, response);
         } else if (authrizationHeader == null || !authrizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
             // 토큰값이 없거나 정상적이지 않다면 400 오류

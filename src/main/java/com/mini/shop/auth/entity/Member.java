@@ -31,9 +31,13 @@ public class Member {
     private String nickname;
 
     @ManyToMany
-    private List<Role> roles = new ArrayList<>();
+    @JoinTable(
+            name = "member_role",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_name", referencedColumnName = "role_name")})
+    private Set<Role> roles;
 
-    @Column(name = "refreshToken")
+    @Column(name = "refresh_token")
     private String refreshToken;
 
     public void updateRefreshToken(String newToken) {

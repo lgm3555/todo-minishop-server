@@ -38,7 +38,7 @@ public class UserService {
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
-                .roles(Collections.singletonList(role))
+                .roles(Collections.singleton(role))
                 .build();
 
         return userDto.convertToDto(userRepository.save(member));

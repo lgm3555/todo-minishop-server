@@ -90,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
          *
          * 세션을 사용하지 않기 때문에 설정을 STATELESS로 설정
          *
-         * 로그인 API, 회원가입 rAPI는 토큰이 없는 상태에기 떄문에 pemitAll로 지정
+         * 로그인 API, 회원가입API는 토큰이 없는 상태에기 떄문에 pemitAll로 지정
          *
          * JwtFilter를 addFilterBefore로 등록했던 JwtSecurityConfig 클래스도 적용
          */
@@ -101,7 +101,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
-        http.authorizeRequests().antMatchers("/auth/signUp", "/auth/refresh").permitAll();
+        http.authorizeRequests().antMatchers("/auth/signUp", "auth/signIn", "/auth/refresh").permitAll();
         http.authorizeRequests().antMatchers("/auth/user/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers("/auth/admin/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();

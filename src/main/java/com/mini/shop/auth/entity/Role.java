@@ -2,10 +2,7 @@ package com.mini.shop.auth.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Role")
@@ -17,7 +14,6 @@ import javax.persistence.Table;
 public class Role {
 
     @Id
-    @Column(name = "roleName", length = 50)
+    @Column(name = "role_name", length = 50)
     private String roleName;
-
 }
