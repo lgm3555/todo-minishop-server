@@ -22,8 +22,7 @@ public class JwtAuthenticationForbbidenHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-
-        ErrorResponse errorResponse = new ErrorResponse(403, "해당 자원에 대한 접근 권한이 없습니다.");
+        ErrorResponse errorResponse = new ErrorResponse("E10", "해당 자원에 대한 접근 권한이 없습니다.");
         new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }

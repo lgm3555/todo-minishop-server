@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.mini.shop.config.jwt.JwtConstants.JWT_SECRET;
 import static com.mini.shop.config.jwt.JwtConstants.TOKEN_HEADER_PREFIX;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -41,16 +41,20 @@ public class JwtFilter extends OncePerRequestFilter {
         String authrizationHeader = request.getHeader(AUTHORIZATION);
 
         // 로그인, 리프레시 요청이라면 토큰 검사하지 않음
-        if (servletPath.equals("/auth/signUp") || servletPath.equals("/auth/signIn") || servletPath.equals("/auth/refresh")) {
+        if (servletPath.equals("/auth/sign-up") || servletPath.equals("/auth/sign-in") || servletPath.equals("/auth/refresh") || servletPath.equals("/auth/find-pwd")) {
             filterChain.doFilter(request, response);
         } else if (authrizationHeader == null || !authrizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
-            // 토큰값이 없거나 정상적이지 않다면 400 오류
-            logger.info("CustomAuthorizationFilter : JWT Token이 존재하지 않습니다.");
-            response.setStatus(SC_BAD_REQUEST);
-            response.setContentType(APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-            ErrorResponse errorResponse = new ErrorResponse(400, "JWT Token이 존재하지 않습니다.");
-            new ObjectMapper().writeValue(response.getWriter(), errorResponse);
+            // 인증 확인 엔드포인드가 아니면서 토큰값이 없거나 정상적이지 않다면 401 오류
+            if (servletPath.equals("/auth/user")) {
+                new ObjectMapper().writeValue(response.getWriter(), "");
+            } else {
+                logger.info("CustomAuthorizationFilter : JWT Token이 존재하지 않습니다.");
+                response.setStatus(SC_UNAUTHORIZED);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding("utf-8");
+                ErrorResponse errorResponse = new ErrorResponse("E07", "JWT Token이 존재하지 않습니다.");
+                new ObjectMapper().writeValue(response.getWriter(), errorResponse);
+            }
         } else {
             try {
                 // Access Token만 꺼내옴
@@ -70,10 +74,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             } catch (Exception e) {
                 logger.info("JWT 토큰이 잘못되었습니다. message : {}", e.getMessage());
-                response.setStatus(SC_BAD_REQUEST);
+                response.setStatus(SC_UNAUTHORIZED);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 response.setCharacterEncoding("utf-8");
-                ErrorResponse errorResponse = new ErrorResponse(400, "잘못된 JWT Token 입니다.");
+                ErrorResponse errorResponse = new ErrorResponse("E08", "잘못된 JWT Token 입니다.");
                 new ObjectMapper().writeValue(response.getWriter(), errorResponse);
             }
         }

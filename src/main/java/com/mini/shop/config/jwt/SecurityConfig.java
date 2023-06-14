@@ -70,8 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        System.out.println("securityConfig");
-
         /**
          * HttpServletRequest를 사용하는 요청들에 대한 접근제한 설정
          * /api/hello에 대한 요청은 인증 없이 접근 허용
@@ -95,13 +93,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
          * JwtFilter를 addFilterBefore로 등록했던 JwtSecurityConfig 클래스도 적용
          */
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManagerBean());
-        jwtAuthenticationFilter.setFilterProcessesUrl("/auth/signIn");
+        jwtAuthenticationFilter.setFilterProcessesUrl("/auth/sign-in");
         jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
         jwtAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
-        http.authorizeRequests().antMatchers("/auth/signUp", "auth/signIn", "/auth/refresh").permitAll();
+        http.authorizeRequests().antMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh", "/auth/find-pwd").permitAll();
         http.authorizeRequests().antMatchers("/auth/user/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers("/auth/admin/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();

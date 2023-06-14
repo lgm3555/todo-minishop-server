@@ -22,8 +22,7 @@ public class JwtAuthenticationUnauthorizedHandler implements AuthenticationEntry
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-
-        ErrorResponse errorResponse = new ErrorResponse(401, "인증되지 않거나, 인증 정보가 없습니다.");
+        ErrorResponse errorResponse = new ErrorResponse("E06", "인증되지 않거나, 인증 정보가 없습니다.");
         new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }

@@ -19,10 +19,10 @@ public class JwtFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse
     response, AuthenticationException exception) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-        ErrorResponse errorResponse = new ErrorResponse(401, "ID 또는 비밀번호가 일치하지 않습니다.");
+        ErrorResponse errorResponse = new ErrorResponse("E05", "ID 또는 비밀번호가 일치하지 않습니다.");
         new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }

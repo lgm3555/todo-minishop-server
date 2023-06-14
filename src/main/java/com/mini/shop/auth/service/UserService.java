@@ -4,6 +4,8 @@ import com.mini.shop.auth.dto.UserDto;
 import com.mini.shop.auth.entity.Member;
 import com.mini.shop.auth.entity.Role;
 import com.mini.shop.auth.repository.UserRepository;
+import com.mini.shop.error.exception.DuplicatedUserException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,9 +27,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto signUp(UserDto userDto) {
+    public UserDto signUp(UserDto userDto) throws DuplicatedUserException {
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            throw new RuntimeException("아이디가 이미 존재합니다.");
+            throw new DuplicatedUserException("아이디가 이미 존재합니다.");
         }
 
         Role role = Role.builder()
@@ -42,5 +44,16 @@ public class UserService {
                 .build();
 
         return userDto.convertToDto(userRepository.save(member));
+    }
+
+    public String findPwd(UserDto userDto) {
+        Member member = userRepository.findByUsernameAndNickname(userDto.getUsername(), userDto.getNickname());
+        if (member != null) {
+            String newPwd = RandomStringUtils.randomAlphanumeric(10);
+            member.setPassword(passwordEncoder.encode(newPwd));
+            userRepository.save(member);
+            return newPwd;
+        }
+        return null;
     }
 }

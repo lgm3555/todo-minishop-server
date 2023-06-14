@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static com.mini.shop.config.jwt.JwtConstants.*;
 
+@Transactional
 @Service
 public class AuthTokenService {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenController.class);
@@ -77,7 +79,7 @@ public class AuthTokenService {
     }
 
     public void updateRefreshToken(String username, String refreshToken) {
-        Member member = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Member member = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         member.updateRefreshToken(refreshToken);
     }
 }
