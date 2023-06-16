@@ -5,6 +5,7 @@ import com.mini.shop.auth.entity.Member;
 import com.mini.shop.auth.entity.Role;
 import com.mini.shop.auth.repository.UserRepository;
 import com.mini.shop.error.exception.DuplicatedUserException;
+import com.mini.shop.error.exception.NotFoundUserException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class UserService {
 
     @Transactional
     public UserDto signUp(UserDto userDto) throws DuplicatedUserException {
-        if (userRepository.existsByUsername(userDto.getUsername())) {
+        if (userRepository.existsById(userDto.getId())) {
             throw new DuplicatedUserException("아이디가 이미 존재합니다.");
         }
 
@@ -37,9 +38,12 @@ public class UserService {
                 .build();
 
         Member member = Member.builder()
-                .username(userDto.getUsername())
+                .id(userDto.getId())
                 .password(passwordEncoder.encode(userDto.getPassword()))
-                .nickname(userDto.getNickname())
+                .name(userDto.getName())
+                .address(userDto.getAddress())
+                .email(userDto.getEmail())
+                .phone(userDto.getPhone())
                 .roles(Collections.singleton(role))
                 .build();
 
@@ -47,7 +51,7 @@ public class UserService {
     }
 
     public String findPwd(UserDto userDto) {
-        Member member = userRepository.findByUsernameAndNickname(userDto.getUsername(), userDto.getNickname());
+        Member member = userRepository.findByIdAndEmail(userDto.getId(), userDto.getEmail());
         if (member != null) {
             String newPwd = RandomStringUtils.randomAlphanumeric(10);
             member.setPassword(passwordEncoder.encode(newPwd));
@@ -55,5 +59,10 @@ public class UserService {
             return newPwd;
         }
         return null;
+    }
+
+    public UserDto authInfo(String id) throws NotFoundUserException {
+        Member member = userRepository.findById(id).orElseThrow(() -> new NotFoundUserException("존재하지 않는 아이디 입니다."));
+        return UserDto.convertToDto(member);
     }
 }

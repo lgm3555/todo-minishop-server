@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "Member")
+@Table(name = "tMember")
 @Getter
 @Setter
 @Builder
@@ -17,23 +17,28 @@ import java.util.Set;
 public class Member {
 
     @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
-
-    @Column(name = "username", length = 50, unique = true)
-    private String username;
+    @Column(name = "id")
+    private String id;
 
     @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "nickname", length = 50)
-    private String nickname;
+    @Column(name = "name", length = 50)
+    private String name;
+
+    @Column(name = "email", length = 100)
+    private String email;
+
+    @Column(name = "phone", length = 100)
+    private String phone;
+
+    @Column(name = "address", length = 200)
+    private String address;
 
     @ManyToMany
     @JoinTable(
-            name = "member_role",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            name = "tMemberRole",
+            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_name", referencedColumnName = "role_name")})
     private Set<Role> roles;
 

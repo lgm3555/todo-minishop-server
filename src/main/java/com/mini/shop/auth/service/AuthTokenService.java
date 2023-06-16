@@ -43,15 +43,15 @@ public class AuthTokenService {
 
         // === Access Token 재발급 === //
         long now = System.currentTimeMillis();
-        String username = decodedJWT.getSubject();
-        Member member = userRepository.findByUsername(username)
+        String id = decodedJWT.getSubject();
+        Member member = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         if (!member.getRefreshToken().equals(refreshToken)) {
             throw new JWTVerificationException("유효하지 않은 Refresh Token 입니다.");
         }
 
         String accessToken = JWT.create()
-                .withSubject(member.getUsername())
+                .withSubject(member.getId())
                 .withExpiresAt(new Date(now + AT_EXP_TIME))
                 .withClaim("roles", member.getRoles().stream().map(Role::getRoleName)
                         .collect(Collectors.toList()))
@@ -66,7 +66,7 @@ public class AuthTokenService {
         long diffMin = (refreshExpireTime - now) / 1000 / 60;
         if (diffMin < 5) {
             String newRefreshToken = JWT.create()
-                    .withSubject(member.getUsername())
+                    .withSubject(member.getId())
                     .withExpiresAt(new Date(now + RT_EXP_TIME))
                     .sign(Algorithm.HMAC256(JWT_SECRET));
             tokenDto.setRefreshToken(newRefreshToken);
@@ -78,8 +78,8 @@ public class AuthTokenService {
         return Optional.of(tokenDto);
     }
 
-    public void updateRefreshToken(String username, String refreshToken) {
-        Member member = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    public void updateRefreshToken(String id, String refreshToken) {
+        Member member = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         member.updateRefreshToken(refreshToken);
     }
 }

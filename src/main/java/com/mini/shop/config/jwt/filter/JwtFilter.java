@@ -67,9 +67,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 // === Access Token 내 Claim에서 Authorities 꺼내 Authentication 객체 생성 & SecurityContext에 저장 === //
                 List<String> strAuthorities = decodedJWT.getClaim("roles").asList(String.class);
                 List<SimpleGrantedAuthority> authorities = strAuthorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-                String username = decodedJWT.getSubject();
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                String id = decodedJWT.getSubject();
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                request.setAttribute("id", id);
 
                 filterChain.doFilter(request, response);
             } catch (Exception e) {

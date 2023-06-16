@@ -27,13 +27,13 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = userRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        Member member = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("UserDetailsService - loadUserByUsername : 데이터베이스에서 찾을 수 없습니다."));
 
         List<SimpleGrantedAuthority> authorities = member.getRoles()
                 .stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 
-        return new User(member.getUsername(), member.getPassword(), authorities);
+        return new User(member.getId(), member.getPassword(), authorities);
     }
 }
