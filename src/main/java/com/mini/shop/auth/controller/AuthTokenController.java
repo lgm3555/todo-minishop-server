@@ -3,6 +3,7 @@ package com.mini.shop.auth.controller;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.mini.shop.auth.dto.TokenDto;
 import com.mini.shop.auth.service.AuthTokenService;
+import com.mini.shop.error.exception.ExpireTokenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class AuthTokenController {
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<TokenDto> refresh(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<TokenDto> refresh(HttpServletRequest request, HttpServletResponse response) throws ExpireTokenException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {

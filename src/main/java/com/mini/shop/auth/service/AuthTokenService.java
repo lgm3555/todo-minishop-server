@@ -11,6 +11,8 @@ import com.mini.shop.auth.entity.Member;
 import com.mini.shop.auth.entity.Role;
 import com.mini.shop.auth.repository.UserRepository;
 import com.mini.shop.config.jwt.TokenProvider;
+import com.mini.shop.error.exception.ExpireTokenException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -37,7 +39,7 @@ public class AuthTokenService {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
-    public Optional<TokenDto> refresh(String refreshToken) {
+    public Optional<TokenDto> refresh(String refreshToken) throws ExpireTokenException {
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
 
@@ -47,7 +49,7 @@ public class AuthTokenService {
         Member member = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         if (!member.getRefreshToken().equals(refreshToken)) {
-            throw new JWTVerificationException("유효하지 않은 Refresh Token 입니다.");
+            throw new ExpireTokenException("유효하지 않은 Refresh Token 입니다.");
         }
 
         String accessToken = JWT.create()
@@ -74,6 +76,7 @@ public class AuthTokenService {
         }
 
         tokenDto.setAccessToken(accessToken);
+        tokenDto.setRefreshToken(refreshToken);
 
         return Optional.of(tokenDto);
     }

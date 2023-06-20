@@ -3,6 +3,7 @@ package com.mini.shop.config.jwt.handler;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mini.shop.auth.dto.TokenDto;
 import com.mini.shop.auth.service.AuthTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -57,9 +58,9 @@ public class JwtSuccessHandler implements AuthenticationSuccessHandler {
         response.setHeader(AT_HEADER, accessToken);
         response.setHeader(RT_HEADER, refreshToken);
 
-        Map<String, String> responseMap = new HashMap<>();
-        responseMap.put(AT_HEADER, accessToken);
-        responseMap.put(RT_HEADER, refreshToken);
-        new ObjectMapper().writeValue(response.getWriter(), responseMap);
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setAccessToken(accessToken);
+        tokenDto.setRefreshToken(refreshToken);
+        new ObjectMapper().writeValue(response.getWriter(), tokenDto);
     }
 }
