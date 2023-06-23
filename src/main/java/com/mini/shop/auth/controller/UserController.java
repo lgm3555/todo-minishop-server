@@ -27,17 +27,22 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@Valid @RequestBody UserDto userDto) throws DuplicatedUserException {
-        return new ResponseEntity<>(userService.signUp(userDto), HttpStatus.OK);
+    public ResponseEntity<?> insertSignUp(@Valid @RequestBody UserDto userDto) throws DuplicatedUserException {
+        return new ResponseEntity<>(userService.insertSignUp(userDto), HttpStatus.OK);
     }
 
     @PostMapping("/find-pwd")
-    public ResponseEntity<?> findPwd(@Valid @RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.findPwd(userDto), HttpStatus.OK);
+    public ResponseEntity<?> getFindPwd(@Valid @RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.getFindPwd(userDto), HttpStatus.OK);
     }
 
     @GetMapping("/info")
-    public ResponseEntity<?> authInfo(HttpServletRequest request, HttpServletResponse response) throws NotFoundUserException {
-        return new ResponseEntity<>(userService.authInfo(request.getAttribute("id").toString()), HttpStatus.OK);
+    public ResponseEntity<?> getMemberInfo(HttpServletRequest request, HttpServletResponse response) throws NotFoundUserException {
+        return new ResponseEntity<>(userService.getMemberInfo(request.getAttribute("id").toString()), HttpStatus.OK);
+    }
+
+    @PutMapping("/info")
+    public ResponseEntity<?> updateMemberInfo(@Valid @RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.updateMemberInfo(userDto), HttpStatus.OK);
     }
 }

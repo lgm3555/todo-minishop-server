@@ -11,8 +11,6 @@ import java.util.Set;
 @Table(name = "tMember")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Member {
 

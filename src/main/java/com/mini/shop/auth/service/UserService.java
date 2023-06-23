@@ -28,29 +28,21 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto signUp(UserDto userDto) throws DuplicatedUserException {
+    public UserDto insertSignUp(UserDto userDto) throws DuplicatedUserException {
         if (userRepository.existsById(userDto.getId())) {
             throw new DuplicatedUserException("아이디가 이미 존재합니다.");
         }
 
-        Role role = Role.builder()
-                .roleName("ROLE_USER")
-                .build();
+        Role role = new Role();
+        role.setRoleName("ROLE_USER");
 
-        Member member = Member.builder()
-                .id(userDto.getId())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .name(userDto.getName())
-                .address(userDto.getAddress())
-                .email(userDto.getEmail())
-                .phone(userDto.getPhone())
-                .roles(Collections.singleton(role))
-                .build();
+        Member member = convertToEntity(userDto);
+        member.setRoles(Collections.singleton(role));
 
         return userDto.convertToDto(userRepository.save(member));
     }
 
-    public String findPwd(UserDto userDto) {
+    public String getFindPwd(UserDto userDto) {
         Member member = userRepository.findByIdAndEmail(userDto.getId(), userDto.getEmail());
         if (member != null) {
             String newPwd = RandomStringUtils.randomAlphanumeric(10);
@@ -61,8 +53,24 @@ public class UserService {
         return null;
     }
 
-    public UserDto authInfo(String id) throws NotFoundUserException {
+    public UserDto getMemberInfo(String id) throws NotFoundUserException {
         Member member = userRepository.findById(id).orElseThrow(() -> new NotFoundUserException("존재하지 않는 아이디 입니다."));
         return UserDto.convertToDto(member);
+    }
+
+    public UserDto updateMemberInfo(UserDto userDto) {
+        Member member = convertToEntity(userDto);
+        return UserDto.convertToDto(userRepository.save(member));
+    }
+
+    private Member convertToEntity(UserDto userDto) {
+        Member member = new Member();
+        if (!userDto.getId().equals("")) member.setId(userDto.getId());
+        if (!userDto.getPassword().equals("")) member.setPassword(userDto.getPassword());
+        if (!userDto.getName().equals("")) member.setName(userDto.getName());
+        if (!userDto.getEmail().equals("")) member.setEmail(userDto.getEmail());
+        if (!userDto.getPhone().equals("")) member.setPhone(userDto.getPhone());
+        if (!userDto.getAddress().equals("")) member.setAddress(userDto.getAddress());
+        return member;
     }
 }
