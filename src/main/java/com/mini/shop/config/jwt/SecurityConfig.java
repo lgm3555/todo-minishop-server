@@ -99,7 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { //추가적�
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 사용 X
-        http.authorizeRequests().antMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh", "/auth/find-pwd").permitAll();
+        http.authorizeRequests().antMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh", "/auth/find-pwd", "/product/**").permitAll();
         http.authorizeRequests().antMatchers("/auth/user/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers("/auth/admin/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();

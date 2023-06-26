@@ -4,7 +4,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.mini.shop.error.exception.DuplicatedUserException;
 import com.mini.shop.error.exception.ExpireTokenException;
 import com.mini.shop.error.exception.NotFoundUserException;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.http.HttpStatus;

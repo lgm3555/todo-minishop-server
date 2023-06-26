@@ -13,6 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Category {
 
+    public Category(Long categoryCode) {
+        this.categoryCode = categoryCode;
+    }
+
     @Id
     @Column(name = "category_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

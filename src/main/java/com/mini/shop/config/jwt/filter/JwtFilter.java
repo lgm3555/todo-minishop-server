@@ -41,7 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String authrizationHeader = request.getHeader(AUTHORIZATION);
 
         // 로그인, 리프레시 요청이라면 토큰 검사하지 않음
-        if (servletPath.equals("/auth/sign-up") || servletPath.equals("/auth/sign-in") || servletPath.equals("/auth/refresh") || servletPath.equals("/auth/find-pwd")) {
+        if (servletPath.equals("/auth/sign-up") || servletPath.equals("/auth/sign-in") || servletPath.equals("/auth/refresh") || servletPath.equals("/auth/find-pwd")
+                || servletPath.startsWith("/product")) {
             filterChain.doFilter(request, response);
         } else if (authrizationHeader == null || !authrizationHeader.startsWith(TOKEN_HEADER_PREFIX)) {
             // 인증 확인 엔드포인드가 아니면서 토큰값이 없거나 정상적이지 않다면 401 오류
