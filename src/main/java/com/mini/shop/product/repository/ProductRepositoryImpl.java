@@ -17,7 +17,6 @@ public class ProductRepositoryImpl implements ProductCustomRepository {
 
     @Override
     public List<Product> getPopularProductList() {
-
         List<Product> result = jpaQueryFactory
                 .selectFrom(product)
                 .orderBy(product.orderCount.desc())

@@ -1,5 +1,6 @@
 package com.mini.shop.product.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +12,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Category {
-
-    public Category(Long categoryCode) {
-        this.categoryCode = categoryCode;
-    }
 
     @Id
     @Column(name = "category_code")

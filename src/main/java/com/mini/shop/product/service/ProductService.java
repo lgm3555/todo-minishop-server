@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class ProductService {
+
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     private final ProductRepository productRepository;
@@ -29,11 +30,11 @@ public class ProductService {
         List<ProductDto> productDtoList = new ArrayList<>();
 
         if (!getCategoryCheck(categoryCode)) {
-            logger.info("인기상품");
             productList = productRepository.getPopularProductList();
         } else {
-            Category category = new Category(categoryCode);
-            productList = productRepository.findByCategoryCode(category);
+            Category category = new Category();
+            category.setCategoryCode(categoryCode);
+            productList = productRepository.findByCategory(category);
         }
 
         for (Product product : productList) {

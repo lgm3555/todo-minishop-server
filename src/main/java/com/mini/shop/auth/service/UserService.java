@@ -66,7 +66,7 @@ public class UserService {
     private Member convertToEntity(UserDto userDto) {
         Member member = new Member();
         if (!userDto.getId().equals("")) member.setId(userDto.getId());
-        if (!userDto.getPassword().equals("")) member.setPassword(userDto.getPassword());
+        if (!userDto.getPassword().equals("")) member.setPassword(passwordEncoder.encode(userDto.getPassword()));
         if (!userDto.getName().equals("")) member.setName(userDto.getName());
         if (!userDto.getEmail().equals("")) member.setEmail(userDto.getEmail());
         if (!userDto.getPhone().equals("")) member.setPhone(userDto.getPhone());
