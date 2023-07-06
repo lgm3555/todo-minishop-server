@@ -3,6 +3,7 @@ package com.mini.shop.product.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Table(name = "tProduct")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Product {
 

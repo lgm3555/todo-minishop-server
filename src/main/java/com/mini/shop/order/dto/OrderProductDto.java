@@ -1,19 +1,20 @@
 package com.mini.shop.order.dto;
 
+import com.mini.shop.order.entity.Order;
 import com.mini.shop.order.entity.OrderProduct;
 import com.mini.shop.product.entity.Product;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderProductDto {
 
-    private Product product;
+    private Long orderSeq;
+
+    private Long productCode;
 
     private int count;
 
@@ -21,7 +22,8 @@ public class OrderProductDto {
 
     public static OrderProductDto convertToDto(OrderProduct orderProduct) {
         OrderProductDto orderProductDto = new OrderProductDto();
-        orderProductDto.setProduct(orderProduct.getProduct());
+        orderProductDto.setOrderSeq(orderProduct.getOrder().getOrderSeq());
+        orderProductDto.setProductCode(orderProduct.getProduct().getProductCode());
         orderProductDto.setCount(orderProduct.getCount());
         orderProductDto.setAmount(orderProduct.getAmount());
         return orderProductDto;

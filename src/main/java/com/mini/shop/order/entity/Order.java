@@ -4,6 +4,7 @@ import com.mini.shop.auth.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Table(name = "tOrder")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Order {
 
@@ -35,7 +37,7 @@ public class Order {
     private String orderDate;
 
     @Column(name = "payment_amount")
-    private String paymentAmount;
+    private int paymentAmount;
 
     @Column(name = "statement")
     @Enumerated(EnumType.STRING)

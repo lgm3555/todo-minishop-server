@@ -7,19 +7,18 @@ import com.mini.shop.order.dto.OrderDto;
 import com.mini.shop.order.dto.OrderProductDto;
 import com.mini.shop.order.entity.Order;
 import com.mini.shop.order.entity.OrderProduct;
+import com.mini.shop.order.repository.OrderProductRepository;
 import com.mini.shop.order.repository.OrderRepository;
 import com.mini.shop.product.dto.ProductDto;
 import com.mini.shop.product.entity.Product;
 import com.mini.shop.product.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class OrderService {
@@ -29,11 +28,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final OrderProductRepository orderProductRepository;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, OrderProductRepository orderProductRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.orderProductRepository = orderProductRepository;
     }
 
     public List<OrderDto> getOrderList(String id) {
@@ -60,47 +61,56 @@ public class OrderService {
         return productDtoList;
     }
 
-    //TODO 주문 입력
-    public OrderDto insertOrder(OrderDto orderDto) throws NotFoundUserException {
-        int totalPrice = 0;
-        Member member = userRepository.findById(orderDto.getId()).orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
-        List<OrderProduct> orderProductList = new ArrayList<>();
-
-        Set<OrderProductDto> orderProductDtoList = orderDto.getOrderProductDto();
-        if (orderProductList != null) {
-            for (OrderProductDto orderProductDto : orderProductDtoList) {
-                Product product = productRepository.findById(orderProductDto.getProduct().getProductCode()).get();
-                totalPrice += product.getPrice() * orderProductDto.getCount();
-
-                OrderProduct orderProduct = convertToEntity(orderProductDto);
-                orderProductList.add(orderProduct);
-            }
-        } else {
-
-        }
+    @Transactional
+    public OrderDto insertOrder(OrderDto orderDto, String id) throws NotFoundUserException {
+        Member member = userRepository.findById(id).orElseThrow(() -> new NotFoundUserException("사용자를 찾을 수 없습니다."));
+        orderDto.setMember(member);
 
         Order order = convertToEntity(orderDto);
-        return orderDto.convertToDto(orderRepository.save(order));
+        Order orderResult = orderRepository.save(order);
+
+        List<OrderProductDto> orderProductDtoList = insertOrderProduct(orderDto.getOrderProduct(), order);
+
+        OrderDto result = OrderDto.convertToDto(orderResult);
+        result.setOrderProduct(orderProductDtoList);
+
+        return result;
+    }
+    
+    private List<OrderProductDto> insertOrderProduct(List<OrderProductDto> orderProductDtoList, Order order) {
+        List<OrderProductDto> result = new ArrayList<>();
+
+        if (orderProductDtoList != null) {
+            for (OrderProductDto orderProductDto : orderProductDtoList) {
+                // 상품 체크
+                Product product = productRepository.findById(orderProductDto.getProductCode()).get();
+
+                if (product != null) {
+                    OrderProduct orderProduct = new OrderProduct();
+                    orderProduct.setOrder(order);
+                    orderProduct.setProduct(product);
+                    orderProduct.setAmount(orderProductDto.getAmount());
+                    orderProduct.setCount(orderProductDto.getCount());
+
+                    result.add(OrderProductDto.convertToDto(orderProductRepository.save(orderProduct)));
+                }
+            }
+        }
+
+        return result;
     }
 
     private Order convertToEntity(OrderDto orderDto) {
         Order order = new Order();
         if (!String.valueOf(orderDto.getOrderSeq()).equals("")) order.setOrderSeq(orderDto.getOrderSeq());
+        if (orderDto.getMember() != null) order.setMember(orderDto.getMember());
         if (!orderDto.getReciver().equals("")) order.setReciver(orderDto.getReciver());
         if (!orderDto.getPhone().equals("")) order.setPhone(orderDto.getPhone());
         if (!orderDto.getEmail().equals("")) order.setEmail(orderDto.getEmail());
         if (!orderDto.getAddress().equals("")) order.setAddress(orderDto.getAddress());
         if (!orderDto.getOrderDate().equals("")) order.setOrderDate(orderDto.getOrderDate());
-        if (!orderDto.getPaymentAmount().equals("")) order.setPaymentAmount(orderDto.getPaymentAmount());
+        if (!String.valueOf(orderDto.getPaymentAmount()).equals("")) order.setPaymentAmount(orderDto.getPaymentAmount());
         if (!orderDto.getStatement().equals("")) order.setStatement(orderDto.getStatement());
         return order;
-    }
-
-    private OrderProduct convertToEntity(OrderProductDto orderProductDto) {
-        OrderProduct orderProduct = new OrderProduct();
-        if (orderProductDto.getProduct() != null) orderProduct.setProduct(orderProductDto.getProduct());
-        if (!String.valueOf(orderProductDto.getCount()).equals("")) orderProduct.setCount(orderProductDto.getCount());
-        if (!String.valueOf(orderProductDto.getAmount()).equals("")) orderProduct.setAmount(orderProductDto.getAmount());
-        return orderProduct;
     }
 }

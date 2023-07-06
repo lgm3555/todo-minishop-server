@@ -30,14 +30,13 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getOrderList(request.getAttribute("id").toString()), HttpStatus.OK);
     }
 
-    @GetMapping("/list/{orderSeq}")
+    @GetMapping("/{orderSeq}")
     public ResponseEntity<?> getOrderDetail(HttpServletRequest request, @PathVariable Long orderSeq) {
         return new ResponseEntity<>(orderService.getOrderDetail(request.getAttribute("id").toString(), orderSeq), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<?> insertOrder(HttpServletRequest request, @Valid @RequestBody OrderDto orderDto) throws NotFoundUserException {
-        orderDto.setId(request.getAttribute("id").toString());
-        return new ResponseEntity<>(orderService.insertOrder(orderDto), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.insertOrder(orderDto, request.getAttribute("id").toString()), HttpStatus.OK);
     }
 }

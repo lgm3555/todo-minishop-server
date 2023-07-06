@@ -1,23 +1,22 @@
 package com.mini.shop.order.dto;
 
+import com.mini.shop.auth.entity.Member;
 import com.mini.shop.order.entity.Order;
 import com.mini.shop.order.entity.OrderStatement;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDto {
 
-    private long orderSeq;
+    private Long orderSeq;
 
-    private String id;
+    private Member member;
 
     private String reciver;
 
@@ -29,18 +28,16 @@ public class OrderDto {
 
     private String orderDate;
 
-    private String paymentAmount;
+    private int paymentAmount;
 
     private OrderStatement statement;
 
-    private int orderProductCount;
-
-    private Set<OrderProductDto> orderProductDto;
+    private List<OrderProductDto> orderProduct;
 
     public static OrderDto convertToDto(Order order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setOrderSeq(order.getOrderSeq());
-        orderDto.setId(order.getMember().getId());
+        orderDto.setMember(order.getMember());
         orderDto.setReciver(order.getReciver());
         orderDto.setPhone(order.getPhone());
         orderDto.setEmail(order.getEmail());

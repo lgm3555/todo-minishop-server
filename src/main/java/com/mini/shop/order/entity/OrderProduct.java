@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
+@IdClass(OrderProductId.class)
 public class OrderProduct implements Serializable {
 
     @Id
