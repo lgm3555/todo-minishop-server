@@ -32,7 +32,7 @@ public class OrderController {
 
     @GetMapping("/{orderSeq}")
     public ResponseEntity<?> getOrderDetail(HttpServletRequest request, @PathVariable Long orderSeq) {
-        return new ResponseEntity<>(orderService.getOrderDetail(request.getAttribute("id").toString(), orderSeq), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getOrder(request.getAttribute("id").toString(), orderSeq), HttpStatus.OK);
     }
 
     @PostMapping

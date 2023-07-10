@@ -3,6 +3,7 @@ package com.mini.shop.order.dto;
 import com.mini.shop.auth.entity.Member;
 import com.mini.shop.order.entity.Order;
 import com.mini.shop.order.entity.OrderStatement;
+import com.mini.shop.product.dto.ProductDto;
 import lombok.*;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public class OrderDto {
     private OrderStatement statement;
 
     private List<OrderProductDto> orderProduct;
+
+    private List<ProductDto> product;
 
     public static OrderDto convertToDto(Order order) {
         OrderDto orderDto = new OrderDto();

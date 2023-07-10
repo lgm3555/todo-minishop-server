@@ -30,6 +30,16 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
     }
 
     @Override
+    public Order getOrder(Long orderSeq) {
+        Order result = jpaQueryFactory
+                .selectFrom(order)
+                .where(order.orderSeq.eq(orderSeq))
+                .fetchOne();
+
+        return result;
+    }
+
+    @Override
     public List<Product> getOrderDetail(String id, Long orderSeq) {
         List<Product> result = jpaQueryFactory
                 .select(product)

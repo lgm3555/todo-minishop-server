@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface OrderCustomRepository {
     List<Order> getOrderList(String id);
+    Order getOrder(Long orderSeq);
     List<Product> getOrderDetail(String id, Long orderSeq);
 }

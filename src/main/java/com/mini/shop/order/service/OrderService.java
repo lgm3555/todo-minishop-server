@@ -43,13 +43,25 @@ public class OrderService {
 
         for (Order order : orderList) {
             OrderDto orderDto = OrderDto.convertToDto(order);
+            List<ProductDto> productDtoList = getOrderDetail(id, orderDto.getOrderSeq());
+            orderDto.setProduct(productDtoList);
             orderDtoList.add(orderDto);
         }
 
         return orderDtoList;
     }
 
-    public List<ProductDto> getOrderDetail(String id, Long orderSeq) {
+    public OrderDto getOrder(String id, Long orderSeq) {
+        Order order = orderRepository.getOrder(orderSeq);
+        OrderDto orderDto = OrderDto.convertToDto(order);
+
+        List<ProductDto> productDtoList = getOrderDetail(id, orderSeq);
+        orderDto.setProduct(productDtoList);
+
+        return orderDto;
+    }
+
+    private List<ProductDto> getOrderDetail(String id, Long orderSeq) {
         List<ProductDto> productDtoList = new ArrayList<>();
         List<Product> productList = orderRepository.getOrderDetail(id, orderSeq);
 
